@@ -102,6 +102,9 @@ style: |
     flex-grow: 1;
     margin: 0 10px;
   }
+  .step.flag {
+    border-color: #4DD0E1;
+  }
   .arrow {
     color: #4DD0E1;
     font-size: 1.4em;
@@ -122,37 +125,41 @@ Check quality as you write, commit, and deploy code.
 
 <!--
 Speaker Notes:
-- Welcome everyone to this presentation on Quality Checks for Developers and Data Professionals.
-- My name is John Carlo Santos, and I work primarily as a generalist developer focused on CI/CD and infrastructure.
-- Today, we're going to talk about how data professionals can adopt software engineering quality controls—linters, formatters, and tests—to build more resilient pipelines, save time, and onboard team members faster.
+- Welcome. Keep bio intentionally light here — the ComplyAIgent reveal later does the "credibility" work, don't spend it now.
 -->
 
 ---
 
-# John Carlo Santos
+# Tonight
 
-### Generalist Developer
-* CI/CD & Infra pipelines
-* Automation & Guardrails
-* Improving developer experience (DX)
+1. **Poll** — quick gut-check on where the room's at
+2. **Why** — the blurring line between DA / DE / DS / DG
+3. **What** — quality checks, secrets scanning, schema validation
+4. **How** — the pipeline, a live tool reveal, and building it together
+5. **Build it** — live coding on a real repo
 
 <!--
 Speaker Notes:
-- I currently focus on CI/CD and Infrastructure, and I build tools that help with systems and developers
+- Agenda slide, keep it fast. Sets expectation this is lecture-then-build, not pure lecture.
 -->
 
 ---
 
-# Why?
+# Quick Poll
 
-- Data Roles(DA, DE, DS) and Software Development boundary is blurring
-- High (time) reward action
+Drop a reaction in Discord:
+
+* 🟦 Used **YAML** before?
+* 🟩 Used **GitHub Actions** / CI-CD?
+* 🟨 Used **pre-commit** hooks?
+* 🟥 Ever built a code quality flow from scratch?
 
 <!--
 Speaker Notes:
-- The line between Data Roles are and have been shrinking
-- Adding checks to codebase is a high-reward action, yet is easy to implement
+- Platform is Discord — run as a reaction poll (or poll bot) at the start, not a show of hands. Give it ~30-60s to land before checking counts.
+- Use the results to calibrate how much to explain vs. skip later — if reactions are light on pre-commit, slow down there.
 -->
+
 ---
 
 # Prerequisites
@@ -162,8 +169,22 @@ Speaker Notes:
 
 <!--
 Speaker Notes:
-- We assume you have a basic grasp of Git (e.g., committing, cloning, pushing).
-- YAML is also required because almost every modern developer tool configures its settings using YAML.
+- Brief. Templates handle the depth — this is just a level-set.
+-->
+
+---
+
+<!-- _backgroundColor: #242b35 -->
+
+# Why?
+
+* The line between **DA, DE, DS, DG** is blurring
+* Poll probably just proved it
+* Quality checks are a **high-reward, low-effort** habit
+
+<!--
+Speaker Notes:
+- Let the poll results do most of the talking here. This should be quick.
 -->
 
 ---
@@ -195,9 +216,68 @@ Programmatic code validation before deployment
 
 <!--
 Speaker Notes:
-- Define what quality checks mean in this context. It's about automated, programmatic validation, not just manual verification.
-- We divide this into Code Quality (making sure the code is structured correctly, readable, and free of syntax errors) and Data Quality (making sure the data ingested/output matches schemas and limits).
-- Highlighting that for data professionals, testing the logic of your transformations is as important as checking the structure of the data.
+- Code Quality = correctness/readability of code itself. Data Quality = correctness of what flows through it.
+-->
+
+---
+
+<!-- _backgroundColor: #242b35 -->
+
+# What Are We Protecting?
+
+* **Secrets & Credentials**: API keys, database URIs, token strings. (Once committed, they are permanently compromised!)
+* **Code Integrity**: Broken dependencies, invalid syntax, or missing configs.
+* **Data Schemas**: Bad fields, structural type drift, or empty outputs.
+* **Team Velocity**: Automation stops bikeshedding on format style during PRs.
+
+<!--
+Speaker Notes:
+- Secrets: Once written to a git commit, it is in your git history forever. Deleting it in a later commit is NOT enough.
+- Code/Data integrity: Block compile/import errors from leaving local environments.
+- Velocity: Formatting tools take human bias out of code reviews.
+-->
+
+---
+
+# Secrets Scanning: Fast vs. Thorough
+
+<div class="grid-2">
+<div>
+
+### ⚡ Local (Pre-Commit)
+* Scans **staged files only**
+* Seconds
+* Catches the obvious: hardcoded keys, `.env` in a commit
+
+</div>
+<div>
+
+### 🔍 Remote (CI)
+* Scans **full repo / history**
+* Minutes
+* Catches the sneaky: obfuscated, split, or encoded secrets
+
+</div>
+</div>
+
+<!--
+Speaker Notes:
+- This is the "when to use which" metric: speed vs. coverage. Fast local check for the obvious stuff, slower CI-stage check for what regex/humans miss.
+- This sets up the tool reveal later — don't name it yet.
+-->
+
+---
+
+# Schema Validation, in a Nutshell
+
+* Checks the **shape** of data, not the data itself
+* No real dataset needed — validate against a dummy/mock output
+* The check **travels with the repo**; the data doesn't
+* (Pandera — Python-native, no extra config to learn tonight)
+
+<!--
+Speaker Notes:
+- Key teaching point: you don't need real/sensitive data in the repo to validate structure. One-liner, don't deep-dive — templates will have an example.
 -->
 
 ---
@@ -238,92 +318,64 @@ Speaker Notes:
 
 <!--
 Speaker Notes:
-- Give a quick bird-eye view of the tooling landscape.
-- In JS/TS, we use Prettier for formatting and ESLint for code smells.
-- In Python, which is the staple of data pros, Ruff has replaced Black/Flake8/isort as a blazing fast all-in-one linter/formatter. For testing logic, pytest is standard, while Pandera and Great Expectations validate data frames and schemas.
-- In SQL, SQLFluff is a lifesaver for standardizing query formats.
-- For shell scripts, ShellCheck prevents common mistakes.
--->
-
----
-
-<!-- _backgroundColor: #242b35 -->
-
-# Why is this Critical?
-
-<div class="grid-2">
-<div>
-
-### ⏱️ Onboarding Savings
-* **Unified formatting**: Ends style debates
-* **Automated reviews**: Focus on logic
-* **One-command setup**: Instant alignment
-
-</div>
-<div>
-
-### 🛠️ Maintenance Savings
-* **Catch failures locally**: Early feedback
-* **Live documentation**: Self-explanatory tests
-* **Regression safety**: Confident updates
-
-</div>
-</div>
-
-<!--
-Speaker Notes:
-- Focus on the main productivity gains: onboarding and maintenance.
-- For onboarding: standardizing styling with formatters like Black or Ruff means new team members don't need to guess how to style their code. Code reviews are faster because comments aren't cluttered with "add a space here" or "fix indentation".
-- For maintenance: tests act as a documentation system. When dependencies change or APIs update, run the test suite to instantly spot failures before they cause pipeline outages.
--->
-
----
-
-# Why is this Critical? (Data & APIs)
-
-* 🔌 **Fragile APIs**: Mock requests to handle changes
-* 💰 **Cost Control**: Prevent expensive query loops
-* 🛡️ **Rate Limits**: Run local tests without hitting limits
-* 🚯 **Data Trust**: Avoid ingesting garbage data
-
-<!--
-Speaker Notes:
-- Focus on API-specific and data-specific risks.
-- Data professionals write code that fetches from external APIs. APIs change, rate limits get exhausted, and network failures occur. If you do not test these conditions with mock APIs, your production pipelines will crash, or worse, ingest incorrect data.
-- Also, point out the financial cost. A bad data pipeline logic error can query terabytes of data repeatedly in a loop, racking up huge costs. Quality checks catch these issues locally.
+- Mention only, don't dwell. This is on the resources slide/repo too, so no need to read it line by line.
 -->
 
 ---
 
 <!-- _backgroundColor: #1e222b -->
 
-# Our Options: The Pipeline
-
-We implement quality checks at different development stages:
+# The Pipeline
 
 <div class="pipeline">
-  <div class="step">1. IDE Linting</div>
+  <div class="step">IDE Linting</div>
   <div class="arrow">➔</div>
-  <div class="step">2. Git Hooks</div>
+  <div class="step flag">Pre-Commit<br><span style="font-size:0.75em;font-weight:normal;">secrets (fast) + formatting</span></div>
   <div class="arrow">➔</div>
-  <div class="step">3. CI/CD Run</div>
+  <div class="step flag">CI/CD<br><span style="font-size:0.75em;font-weight:normal;">secrets (deep) + schema checks</span></div>
   <div class="arrow">➔</div>
-  <div class="step">4. Production</div>
+  <div class="step">Production</div>
 </div>
-
-<br>
-<br>
-
-* **IDE**: Real-time feedback as you type
-* **Git Hooks**: Pre-commit blocks bad code locally
-* **CI/CD**: Server-side verification before merge
 
 <!--
 Speaker Notes:
-- Explain the pipeline.
-- First, developers get real-time feedback in their editors (IDE extension level).
-- Second, we use Git hooks (pre-commit or Husky). This is a script that runs locally whenever a developer types `git commit`. If code is poorly formatted or has syntax errors, it blocks the commit.
-- Third, we use CI/CD (GitHub Actions) as the final gatekeeper. If the check passes locally but fails on the server, the pull request cannot be merged.
+- Same 4-stage pipeline as before, now annotated with where secrets scanning and schema validation actually sit. This is the visual anchor for the whole talk.
+-->
+
+---
+
+<!-- _backgroundColor: #242b35 -->
+
+# The Cost of Lax Enforcement
+
+* **The Incident**: An automated/AI generation tool faked test success by silently skipping tests.
+* **The Root Cause**: Main branch allowed merging without verifying that tests actually ran and passed.
+* **The Damage**: Half the team (2 out of 4) burned an entire sprint fixing production bugs that a single CI rule would have blocked.
+
+<!--
+Speaker Notes:
+- The Incident: Automated code gen makes it easy to ship features, but also extremely easy to ship bugs at scale if you don't enforce checks. Here, tests were bypassed/skipped, and it merged because there was no active block.
+- Root Cause: Trusting "tests exist" or "build compiled" is not enough. We must enforce that tests actually execute successfully.
+- Damage: 50% of the engineering team's capacity for a sprint was lost cleaning up production errors. A 10-minute CI configuration update would have caught this instantly.
+-->
+
+---
+
+<!-- _backgroundColor: #1a1d20 -->
+
+# The Reveal
+
+*(live demo — no slide content, just the terminal)*
+
+* nutrition-api's `.testenv`, with two planted secrets: one obvious, one obfuscated
+* Pre-commit catches the obvious one instantly
+* The obfuscated one slips past regex — caught in CI instead
+
+<!--
+Speaker Notes:
+- This is the ComplyAIgent moment. Show terminal output / API response, not the frontend (it's a stub).
+- Uses the same repo/.testenv as the live-coding block later — plant the secrets here ahead of time, then it's already in place when you get to "Let's Build It."
+- Don't over-narrate the tool name/backstory — let the demo make the point, this is the "surprise" beat.
 -->
 
 ---
@@ -332,16 +384,8 @@ Speaker Notes:
 
 Fast, local git hooks running *before* code leaves your machine
 
-* **Why use it?**: Catch quick style and syntax issues instantly
-* **Best for**: Code formatters, trailing whitespace, basic linters
-* **Benefit**: Saves CI/CD pipeline queue time and resources
-
-<!--
-Speaker Notes:
-- Introduce pre-commit hooks. They are git hooks that run locally on your own machine.
-- They are extremely fast because they only scan files that you have modified (staged files).
-- Ideal for formatting and styling checks where you don't need a heavy server environment.
--->
+* **Best for**: Formatters, trailing whitespace, basic linters, fast secret scans
+* **Benefit**: Saves CI/CD queue time and resources
 
 ---
 
@@ -351,16 +395,8 @@ Speaker Notes:
 
 Automated CI/CD workflows running in the cloud
 
-* **Why use it?**: The ultimate gatekeeper before merging to `main`
-* **Best for**: Integration tests, database checks, API contract runs
-* **Benefit**: Guarantees code runs in a clean, standardized container
-
-<!--
-Speaker Notes:
-- Introduce GitHub Actions. This is our server-side CI/CD validation.
-- Unlike local git hooks which can be bypassed or skipped by a developer, CI/CD runs automatically on GitHub on every pull request.
-- It is the ultimate shield protecting your main branch.
--->
+* **Best for**: Integration tests, schema/data checks, deep secret scans
+* **Benefit**: Clean, standardized environment — can't be skipped locally
 
 ---
 
@@ -398,73 +434,25 @@ jobs:
 </div>
 </div>
 
-<!--
-Speaker Notes:
-- Explain the structure of a GitHub Actions configuration.
-- We define when the workflow runs, where it runs (e.g., ubuntu-latest), and the steps it takes to checkout the code and run tests.
--->
-
 ---
 
 <!-- _backgroundColor: #1e222b -->
 
-# Pre-Commit vs. CI/CD: Comparison
+# Let's Build It
 
-When to use what?
+We'll set up a quality-check flow on **[nutrition-api](https://github.com/kuyacarlo/nutrition-api)** together:
 
-| Check Type | Pre-Commit (Local) | CI/CD (Remote) |
-| :--- | :--- | :--- |
-| **Execution** | Local machine | Cloud container |
-| **Trigger** | `git commit` (Instant) | Pull Request / Push (1-5 min) |
-| **Ideal Tasks** | Formatting, linting, syntax | Integration tests, DB, deploy |
-| **Environment** | Developer's local system | Clean, standardized VM |
+* FastAPI server (`server/`), migrations (`alembic/`), `test/` suite
+* Already has a `.testenv` — we'll use it as our secrets-scanning target
+* Already has `.github/workflows` — we'll extend it, not start from zero
 
-<!--
-Speaker Notes:
-- Summarize when to use pre-commit vs CI/CD.
-- Pre-commit is for fast, local checks.
-- CI/CD is for heavy, server-wide integration testing and deployment.
--->
-
----
-
-<!-- _backgroundColor: #2c303b -->
-
-# YAML in a Nutshell
-
-Key rules for editing configurations:
-
-<div class="grid-2">
-<div>
-
-* **Key-Value**: `key: value` (note the space!)
-* **Indentation**: Spaces only (no tabs)
-* **Lists**: Prefixed with `-`
-* **Multiline**: `|` (literal), `>` (folded)
-
-</div>
-<div>
-
-```yaml
-# Simple YAML List & Indentation
-repos:
-  - repo: local
-    hooks:
-      - id: run-pytest
-        name: pytest
-        entry: pytest tests/
-        language: system
-```
-
-</div>
-</div>
+Steps: pre-commit config → plant + catch a secret in `.testenv` → extend the existing CI workflow to fail on skipped tests
 
 <!--
 Speaker Notes:
-- YAML stands for "YAML Ain't Markup Language".
-- It is highly human-readable, but strict about spaces.
-- Emphasize the importance of indentation and space characters. Explain the hyphen `-` denotes a list item.
-- Explain the difference between literal `|` and folded `>` for multiline values, which is super useful for running script commands in GitHub Actions.
+- Transition slide into live coding. Templates/starter files provided separately — don't make people type boilerplate live.
+- Repo already has a .testenv file and an existing GitHub Actions workflow — use both as real anchors instead of building fake ones. Extending real config lands better than a toy example.
+- Ties directly back to the failure story: the CI check we add here is the "fail if tests are skipped" check that would've caught the AI-generated code problem.
 -->
 
 ---
@@ -473,10 +461,20 @@ Speaker Notes:
 
 # Key Takeaways
 
-* **Pin Down Styling**: Automate formatting first
-* **Protect Local**: Catch syntax bugs at commit time
-* **Enforce in Cloud**: Run heavier tests in GitHub Actions
-* **Deliver Value**: Save onboarding and debugging days
+* **Pin Down Styling**: Automate formatting first.
+* **Protect Local**: Fast checks catch the obvious — secrets, syntax.
+* **Enforce in Cloud**: Slower, deeper checks — schema, deep secret scans.
+* **Adopt Incrementally**: Start with standard formatting/linters, add secrets scanning, then enforce test rules.
+* **Deliver Value**: Save onboarding and debugging days.
+
+---
+
+# Resources
+
+* Starter repo: `[link/QR]`
+* `.pre-commit-config.yaml` template
+* `ci.yml` template
+* Tooling reference table
 
 <br>
 
@@ -484,8 +482,5 @@ Speaker Notes:
 
 <!--
 Speaker Notes:
-- Summarize the main points.
-- Encourage everyone to start small. Don't try to build a massive testing framework on day one. Start by adding a formatter and a simple pre-commit hook.
-- Once that is working, add schema validation and mock tests.
-- Open the floor for any questions.
+- QR code goes here. This is what people actually take home.
 -->
