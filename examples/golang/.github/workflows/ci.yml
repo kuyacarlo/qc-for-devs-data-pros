@@ -29,7 +29,7 @@ jobs:
         run: |
           # Run Go tests in verbose mode and write output to log
           go test -v ./... | tee go-test.log
-          
+
           # CRITICAL: Fail if any Go tests were skipped in CI.
           # We check the logs for the standard '--- SKIP:' identifier.
           if grep -q '\-\-\- SKIP:' go-test.log; then

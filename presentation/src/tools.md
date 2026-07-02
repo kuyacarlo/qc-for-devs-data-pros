@@ -91,4 +91,3 @@ Since Podman is the default container host in this environment:
   ```bash
   act -n
   ```
-

@@ -32,7 +32,7 @@ jobs:
         run: |
           # Run tests using Jest and output a JSON report
           npm test -- --json --outputFile=jest-report.json || true
-          
+
           # CRITICAL: Parse report. Fail if any test was marked as pending or skipped.
           # Protects against code contributions that bypass tests.
           if [ -f jest-report.json ]; then
@@ -44,7 +44,7 @@ jobs:
               echo "❌ ERROR: $PENDING_COUNT test(s) were skipped or marked as pending/todo!"
               exit 1
             fi
-            
+
             WAS_SUCCESS=$(node -e "
               const report = require('./jest-report.json');
               console.log(report.success);

@@ -40,7 +40,7 @@ jobs:
         run: |
           # Run tests and output reports
           pytest --cov=. --junitxml=pytest-report.xml
-          
+
           # CRITICAL: Fail if tests were skipped/bypassed.
           # Helps detect AI-generated code that skipped its homework.
           if grep -q -E 'skipped="[1-9]' pytest-report.xml; then
