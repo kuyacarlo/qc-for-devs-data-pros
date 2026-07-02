@@ -1,0 +1,38 @@
+# JS/TS-focused pre-commit configuration
+# Enforces code formatting via Prettier, code quality via ESLint, and secrets scan via Gitleaks.
+
+repos:
+  # Standard out-of-the-box hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-json
+      - id: check-added-large-files
+
+  # Prettier: Code Formatter for JS, TS, HTML, CSS, Markdown
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v4.0.0-alpha.8
+    hooks:
+      - id: prettier
+        types_or: [javascript, jsx, ts, tsx, css, html, json, markdown]
+
+  # ESLint: Linter for JS/TS
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v9.3.0
+    hooks:
+      - id: eslint
+        files: \.[jt]sx?$ # Runs on .js, .jsx, .ts, .tsx
+        types: [file]
+        additional_dependencies:
+          - eslint@8.57.0
+          - typescript@5.4.5
+
+  # Gitleaks: Scans for secrets before committing
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.2
+    hooks:
+      - id: gitleaks
+        name: Gitleaks Secrets Scan
+        description: Detects secrets (API keys, passwords, tokens) before they are committed.

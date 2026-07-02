@@ -1,0 +1,45 @@
+# Golang-focused pre-commit configuration
+# Combines basic file checks, golangci-lint, local gofmt, and Gitleaks.
+
+repos:
+  # Standard out-of-the-box hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+
+  # golangci-lint: Fast runner for Go static analysis and linters
+  - repo: https://github.com/golangci/golangci-lint
+    rev: v1.59.0
+    hooks:
+      - id: golangci-lint
+
+  # Local Hooks: Run system go fmt for efficiency
+  - repo: local
+    hooks:
+      - id: go-fmt
+        name: go fmt
+        description: Formats Go source code using standard gofmt.
+        entry: go fmt
+        language: system
+        files: \.go$
+        pass_filenames: true
+
+      - id: go-imports
+        name: goimports
+        description: Formats imports in Go files.
+        entry: goimports -w
+        language: system
+        files: \.go$
+        pass_filenames: true
+
+  # Gitleaks: Scans for secrets before committing
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.2
+    hooks:
+      - id: gitleaks
+        name: Gitleaks Secrets Scan
+        description: Detects secrets (API keys, passwords, tokens) before they are committed.

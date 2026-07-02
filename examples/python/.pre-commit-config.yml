@@ -1,0 +1,37 @@
+# Python-focused pre-commit configuration
+# Integrates basic formatting checks, Ruff (linting & formatting), Mypy (type checking), and Gitleaks.
+
+repos:
+  # Standard out-of-the-box hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-added-large-files
+
+  # Ruff: Blazing fast Python linter and formatter (replaces Black, Flake8, isort)
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.4.4
+    hooks:
+      # Run the linter and auto-fix fixable issues
+      - id: ruff
+        args: [ --fix ]
+      # Run the formatter to enforce consistent styling
+      - id: ruff-format
+
+  # Mypy: Static type checking for Python
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.10.0
+    hooks:
+      - id: mypy
+        additional_dependencies: [types-all] # Automatically install stubs
+
+  # Gitleaks: Scan for hardcoded credentials
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.2
+    hooks:
+      - id: gitleaks
+        name: Gitleaks Secrets Scan

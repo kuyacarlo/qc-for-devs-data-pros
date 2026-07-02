@@ -1,0 +1,50 @@
+name: Python CI
+
+on:
+  push:
+    branches: [ main, master, dev ]
+  pull_request:
+    branches: [ main, master, dev ]
+
+jobs:
+  test:
+    name: Build, Lint & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip' # Cache dependencies for faster runs
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install ruff pytest pytest-cov
+
+      - name: Lint with Ruff
+        run: |
+          # Fails build if there are syntax errors or unresolved imports/issues
+          ruff check . --output-format=github
+
+      - name: Format Check with Ruff
+        run: |
+          # Fails build if Python files are not styled according to formatting standards
+          ruff format . --check
+
+      - name: Run Tests & Check for Skipped Tests
+        run: |
+          # Run tests and output reports
+          pytest --cov=. --junitxml=pytest-report.xml
+          
+          # CRITICAL: Fail if tests were skipped/bypassed.
+          # Helps detect AI-generated code that skipped its homework.
+          if grep -q -E 'skipped="[1-9]' pytest-report.xml; then
+            echo "❌ ERROR: One or more Python tests were skipped!"
+            grep -E -o 'skipped="[0-9]+"' pytest-report.xml
+            exit 1
+          fi

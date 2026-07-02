@@ -1,0 +1,59 @@
+name: Node.js CI
+
+on:
+  push:
+    branches: [ main, master, dev ]
+  pull_request:
+    branches: [ main, master, dev ]
+
+jobs:
+  build-and-test:
+    name: Build, Lint & Test (Node.js)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Linters & Formatter
+        run: |
+          npm run lint --if-present
+          npm run format:check --if-present
+
+      - name: Run Tests & Check for Skipped Tests
+        run: |
+          # Run tests using Jest and output a JSON report
+          npm test -- --json --outputFile=jest-report.json || true
+          
+          # CRITICAL: Parse report. Fail if any test was marked as pending or skipped.
+          # Protects against code contributions that bypass tests.
+          if [ -f jest-report.json ]; then
+            PENDING_COUNT=$(node -e "
+              const report = require('./jest-report.json');
+              console.log(report.numPendingTests || 0);
+            ")
+            if [ "$PENDING_COUNT" -gt 0 ]; then
+              echo "❌ ERROR: $PENDING_COUNT test(s) were skipped or marked as pending/todo!"
+              exit 1
+            fi
+            
+            WAS_SUCCESS=$(node -e "
+              const report = require('./jest-report.json');
+              console.log(report.success);
+            ")
+            if [ "$WAS_SUCCESS" != "true" ]; then
+              echo "❌ ERROR: Test suite failed."
+              exit 1
+            fi
+          else
+            echo "❌ ERROR: jest-report.json was not created. Did the test script run correctly?"
+            exit 1
+          fi

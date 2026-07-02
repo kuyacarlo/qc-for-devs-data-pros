@@ -1,0 +1,39 @@
+name: Go CI
+
+on:
+  push:
+    branches: [ main, master, dev ]
+  pull_request:
+    branches: [ main, master, dev ]
+
+jobs:
+  test:
+    name: Build, Lint & Test (Go)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache: true
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+
+      - name: Run Tests & Check for Skipped Tests
+        run: |
+          # Run Go tests in verbose mode and write output to log
+          go test -v ./... | tee go-test.log
+          
+          # CRITICAL: Fail if any Go tests were skipped in CI.
+          # We check the logs for the standard '--- SKIP:' identifier.
+          if grep -q '\-\-\- SKIP:' go-test.log; then
+            echo "❌ ERROR: One or more Go tests were skipped in CI!"
+            grep '\-\-\- SKIP:' go-test.log
+            exit 1
+          fi
