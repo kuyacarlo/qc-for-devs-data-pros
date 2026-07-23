@@ -59,9 +59,15 @@ style: |
   }
   .tag {
     color: #4DD0E1;
-    font-size: 0.8em;
+    background-color: rgba(77, 208, 225, 0.15);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.7em;
+    font-weight: bold;
     display: inline-block;
-    margin-bottom: 1px;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
   }
   table {
     width: 100% !important;
@@ -114,7 +120,9 @@ style: |
 
 <!-- _backgroundColor: #1a1d20 -->
 
-# <p class="tag"> Quality Checks for Developers & Data Pros </p>
+<div class="tag">Workshop</div>
+
+# Quality Checks for Developers & Data Pros
 
 Check quality as you write, commit, and deploy code.
 
@@ -442,6 +450,7 @@ jobs:
 
 We'll set up a quality-check flow on **[nutrition-api](https://github.com/kuyacarlo/nutrition-api)** together:
 
+* ☁️ **GitHub Codespaces**: One-click cloud environment (skips local install troubleshooting)
 * FastAPI server (`server/`), migrations (`alembic/`), `test/` suite
 * Already has a `.testenv` — we'll use it as our secrets-scanning target
 * Already has `.github/workflows` — we'll extend it, not start from zero
@@ -451,6 +460,7 @@ Steps: pre-commit config → plant + catch a secret in `.testenv` → extend the
 <!--
 Speaker Notes:
 - Transition slide into live coding. Templates/starter files provided separately — don't make people type boilerplate live.
+- Emphasize that we are using GitHub Codespaces to bypass local setup issues (no python/dependencies/venv troubleshooting hell).
 - Repo already has a .testenv file and an existing GitHub Actions workflow — use both as real anchors instead of building fake ones. Extending real config lands better than a toy example.
 - Ties directly back to the failure story: the CI check we add here is the "fail if tests are skipped" check that would've caught the AI-generated code problem.
 -->
