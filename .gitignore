@@ -1,1 +1,13 @@
+# dependencies
 node_modules/
+
+# build / editor
+dist/
+.DS_Store
+.idea/
+.vscode/
+
+# env
+.env
+.env.*
+!.env.example
